@@ -32,14 +32,7 @@ parser.add_argument('-U', metavar='-auth_username', type=str, nargs='?',
 parser.add_argument('-P', metavar='-auth_password', type=str, nargs='?',
                     help='password to login jira', dest='password', required=True)
 
-
-
-
 args = parser.parse_args()
-# print(args)
-# exit()
-
-
 FILENAME = args.file
 GROUPNAME = args.group.upper()
 USERNAME = args.username
@@ -53,10 +46,7 @@ try:
     print("Processing user authentication...")
     jira = JIRA(
         server="https://jira-training.arrowhitech.net",
-        basic_auth=(USERNAME, PASSWORD),  # a username/password tuple [Not recommended]
-        # basic_auth=("email", "API token"),  # Jira Cloud: a username/token tuple
-        # token_auth="",  # Self-Hosted Jira (e.g. Server): the PAT token
-        # auth=("admin", "admin"),  # a username/password tuple for cookie auth [Not recommended]
+        basic_auth=(USERNAME, PASSWORD),
     )
 except Exception as ex:
     print("Error on account connection with Jira. Please check again your username or password")
@@ -73,41 +63,40 @@ try:
     print(f"Created group {GROUPNAME}.")
     print("---------------------------------------------")
 except Exception as ex:
-    # print(ex)
     print(f"Group {GROUPNAME} already exist")
     print("---------------------------------------------")
-        
+
 print("Done.\n")
-# exit()
 
 '''
 ADD USERS TO GROUP 
 '''
 
 if(args.users):
-    list_users = []
-    USERS = args.users.copy()
-    print(f"Adding user to group {GROUPNAME}...\n")
-    for user in USERS:
-        try:
-            response = jira.add_user_to_group(username=user, group=GROUPNAME)
-            print(response)
-            print(f"Added user {user} to group {GROUPNAME}")
-        except Exception as ex:
-            result = re.findall(r"'(.*?)'", ex.text)
-            response_text = ex.text
-            match = response_text.find("already a member")
-            if(match != -1):
-                pass
-            else:
-                list_users.append(result[0])
-            print(response_text)
-            print("---------------------------------------------")
+    if (GROUPNAME):
+        list_users = []
+        USERS = args.users.copy()
+        print(f"Adding user to group {GROUPNAME}...\n")
+        for user in USERS:
+            try:
+                response = jira.add_user_to_group(username=user, group=GROUPNAME)
+                print(response)
+                print(f"Added user {user} to group {GROUPNAME}")
+            except Exception as ex:
+                result = re.findall(r"'(.*?)'", ex.text)
+                response_text = ex.text
+                match = response_text.find("already a member")
+                if(match != -1):
+                    pass
+                else:
+                    list_users.append(result[0])
+                print(response_text)
+                print("---------------------------------------------")
 
-    # print(*list_users)
-    print("Done\n")
-
-
+        print("Done\n")
+    else:
+        print("Must define groupname.")
+        exit()
 
 '''
 GRANT PERMISSION
@@ -126,7 +115,6 @@ if (args.file):
         print("Error on reading file. Wrong filename or file extension")
     else:    
         columns = df.columns[0:]
-        # permissions = df[columns[0]]
         group_columns = df[columns[1]]
         
     permissions = ['Administer Projects',
@@ -194,7 +182,7 @@ if (args.file):
     except Exception as ex:
         print("Error on creating JSON PERMISSION GRANT OBJECT")
         
-    try:   
+    try:
         print("Processing granting permissions...")
         url = "http://jira-training.arrowhitech.net/rest/api/2/permissionscheme"
 
@@ -219,7 +207,6 @@ if (args.file):
         data=payload,
         )
         
-        # print(list_users)
     except Exception as ex:
         print("Error on sending request to grant permissions")
         print(ex.text)
