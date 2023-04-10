@@ -24,3 +24,9 @@ python3 autojira.py -U johnwick -P 123456@ --u johndue alex --g GROUP1 --f myfil
 - Phải nhập vào username và password.
 - Grant permission cần có file excel và tên division kèm theo.
 - Sửa file trong git repo khi muốn thay đổi group phân quyền.
+
+## 5.Quick run:
+### Step 1: git clone https://github.com/miasnguyenx/JIra-automation
+### Step 2: pip install -r requirements.txt
+
+### Step 3: chạy file theo câu lệnh mẫu
